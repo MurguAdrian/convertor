@@ -1,61 +1,75 @@
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html';
+
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 
 void main() {
-  runApp( VideoApp());
+  runApp(Convertor());
 }
 
-class VideoApp extends StatefulWidget {
+class Convertor extends StatefulWidget {
   @override
-  _VideoAppState createState() => _VideoAppState();
+  State<Convertor> createState() => _ConvertorState();
 }
 
-class _VideoAppState extends State<VideoApp> {
-  late VideoPlayerController _controller;
+class _ConvertorState extends State<Convertor> {
+  final TextEditingController controller = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = VideoPlayerController.network(
-        'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4')
-      ..initialize().then((_) {
-        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-        setState(() {});
-      });
-  }
+  String? errorText;
+
+  double conversie = 0;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Video Demo',
       home: Scaffold(
-        body: Center(
-          child: _controller.value.isInitialized
-              ? AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller),
-          )
-              : Container(),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            setState(() {
-              _controller.value.isPlaying
-                  ? _controller.pause()
-                  : _controller.play();
-            });
-          },
-          child: Icon(
-            _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-          ),
+        appBar: AppBar(
+            title: const Center(
+                child: Text("Convertor",
+                    style: TextStyle(color: Colors.red, fontSize: 35.5)))),
+        body: Column(
+          children: <Widget>[
+            Image.network(
+              "https://image.shutterstock.com/image-photo/euro-money-cash-background-banknotes-600w-768058264.jpg",
+            ),
+
+            Container(
+              child: TextField(
+                controller: controller,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                decoration: InputDecoration(
+                  hintText: "Introduceti Valoarea",
+                  errorText: errorText,
+                  suffix: IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () {
+                      controller.clear();
+                    },
+                  ),
+                ),
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.euro),
+              onPressed: () {
+                final String value = controller.text;
+                final double? doublevalue = double.tryParse(value);
+
+                setState(() {
+                  if (doublevalue == null) {
+                    errorText = 'This is not a number';
+                    conversie = 0;
+                  } else {
+                    errorText = '';
+                    conversie = doublevalue * 4.948;
+                  }
+                });
+              },
+            ),
+            conversie == 0 ? Text('') : Text('${conversie.toStringAsFixed(2)} lei'),
+          ],
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _controller.dispose();
   }
 }
