@@ -61,7 +61,7 @@ class _ConvertorState extends State<Convertor> {
                     conversie = 0;
                   } else {
                     errorText = '';
-                    conversie = doublevalue * 4.948;
+                    conversie = doublevalue * 4.95;
                   }
                 });
               },
